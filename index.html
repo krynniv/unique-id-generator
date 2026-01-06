@@ -26,28 +26,31 @@
   </div>
 
   <!-- Modal HTML -->
-  <div id="cipherModal" class="modal">
-    <div class="modal-content">
-      <h3>Your Generated Unique Identity</h3>
-      <p id="cipherText" style="word-break: break-all;"></p>
-      <button class="close-btn" id="closeModal">Close</button>
-    </div>
+<div id="cipherModal" class="modal">
+  <div class="modal-content">
+    <h3>Your Generated Unique Identity</h3>
+    <p id="cipherText" style="word-break: break-all;"></p>
+    <button id="copyBtn" class="copy-btn">Copy</button>
+    <button class="close-btn" id="closeModal">Close</button>
   </div>
+</div>
 
-  <script>
-    const form = document.getElementById('keyForm');
-    const modal = document.getElementById('cipherModal');
-    const cipherText = document.getElementById('cipherText');
-    const closeBtn = document.getElementById('closeModal');
+ 
+<script>
+const form = document.getElementById('keyForm');
+const modal = document.getElementById('cipherModal');
+const cipherText = document.getElementById('cipherText');
+const closeBtn = document.getElementById('closeModal');
+const copyBtn = document.getElementById('copyBtn');
 
-    form.addEventListener('submit', function(e) {
+form.addEventListener('submit', function(e) {
   e.preventDefault();
 
   // Gather form data and convert everything to lowercase
   const formData = new FormData(form);
   let combined = '';
   for (const value of formData.values()) {
-    combined += value.toString().toLowerCase() + '|';  // <-- convert to lowercase
+    combined += value.toString().toLowerCase() + '|';
   }
 
   // Generate deterministic SHA-256 cipher key
@@ -58,18 +61,29 @@
   modal.style.display = 'block';
 });
 
-
-    // Close modal
-    closeBtn.addEventListener('click', function() {
-      modal.style.display = 'none';
+// Copy the cipher key to clipboard
+copyBtn.addEventListener('click', function() {
+  navigator.clipboard.writeText(cipherText.textContent)
+    .then(() => {
+      copyBtn.textContent = 'Copied!';
+      setTimeout(() => copyBtn.textContent = 'Copy', 1500);
+    })
+    .catch(err => {
+      console.error('Copy failed', err);
     });
+});
 
-    // Close modal if clicking outside the content
-    window.addEventListener('click', function(e) {
-      if (e.target == modal) {
-        modal.style.display = 'none';
-      }
-    });
-  </script>
+// Close modal
+closeBtn.addEventListener('click', function() {
+  modal.style.display = 'none';
+});
+
+// Close modal if clicking outside the content
+window.addEventListener('click', function(e) {
+  if (e.target == modal) {
+    modal.style.display = 'none';
+  }
+});
+</script>
 </body>
 </html>
