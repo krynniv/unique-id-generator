@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Unique Digital ID</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 40px; background: #f0f0f0; }
+    .container { max-width: 500px; margin: auto; background: #fff; padding: 30px; border-radius: 10px; }
+    input, button { width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc; }
+    button { background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+    
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.6);
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: 15% auto;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    .close-btn {
+      margin-top: 20px;
+      padding: 8px 16px;
+      background-color: #f44336;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .close-btn:hover { background-color: #d32f2f; }
+  </style>
+
+  <!-- Include your local CryptoJS -->
+  <script src="/crypto-js.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h2 style="text-align:center;">Digital ID Generator</h2>
+    <form id="keyForm">
+      <input type="text" name="fullname" placeholder="Full Name" required>
+      <input type="date" name="birthdate" required>
+      <input type="text" name="drivers_license" placeholder="Driver's License" required>
+      <input type="text" name="philsys_id" placeholder="PhilSys ID" required>
+      <input type="tel" name="mobile_number" placeholder="Mobile Number" required>
+      <input type="email" name="email" placeholder="Email" required>
+      <input type="text" name="domain" placeholder="Domain (example.com)" required>
+      <input type="password" name="secret_key" placeholder="Secret Key" required>
+      <button type="submit">Generate Cipher Key</button>
+    </form>
+  </div>
+
+  <!-- Modal HTML -->
+  <div id="cipherModal" class="modal">
+    <div class="modal-content">
+      <h3>Your Generated Cipher Key</h3>
+      <p id="cipherText" style="word-break: break-all;"></p>
+      <button class="close-btn" id="closeModal">Close</button>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('keyForm');
+    const modal = document.getElementById('cipherModal');
+    const cipherText = document.getElementById('cipherText');
+    const closeBtn = document.getElementById('closeModal');
+
+    form.addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  // Gather form data and convert everything to lowercase
+  const formData = new FormData(form);
+  let combined = '';
+  for (const value of formData.values()) {
+    combined += value.toString().toLowerCase() + '|';  // <-- convert to lowercase
+  }
+
+  // Generate deterministic SHA-256 cipher key
+  const cipherKey = CryptoJS.SHA256(combined).toString(CryptoJS.enc.Hex);
+
+  // Show modal
+  cipherText.textContent = cipherKey;
+  modal.style.display = 'block';
+});
+
+
+    // Close modal
+    closeBtn.addEventListener('click', function() {
+      modal.style.display = 'none';
+    });
+
+    // Close modal if clicking outside the content
+    window.addEventListener('click', function(e) {
+      if (e.target == modal) {
+        modal.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
