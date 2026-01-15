@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const cipherText = document.getElementById('cipherText');
   const closeBtn = document.getElementById('closeModal');
 
-  // A sample 256-word list for demonstration (replace with a full Diceware list for max security)
+  // Example wordlist (replace/add to reach your full list)
   const wordlist = [
     'apple','banana','cherry','delta','echo','foxtrot','golf','hotel','india','juliet',
     'kilo','lima','mango','nectar','orange','papa','quartz','romeo','sierra','tango',
@@ -15,11 +15,10 @@ document.addEventListener('DOMContentLoaded', () => {
     'iris','jade','koala','lunar','myth','nebula','opal','pearl','quiver','ruby','stone',
     'topaz','umber','vio','wisp','xenon','yeti','zeal','azure','blaze','crest','dune',
     'ember','flint','gale','horizon','ivory','javelin','krypton','lynx','mimic','nova',
-    'onyx','pyre','quark','rift','spire','talon','ursa','vortex','willow','xenith','yarn','zenith',
-    // ...add up to 256+ words
+    'onyx','pyre','quark','rift','spire','talon','ursa','vortex','willow','xenith','yarn','zenith'
   ];
 
-  // Replace spaces with hyphens and force lowercase
+  // Force lowercase and replace spaces
   form.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], input[type="tel"]')
     .forEach(input => {
       input.addEventListener('input', () => {
@@ -48,13 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const cipherKey = CryptoJS.SHA256(combined).toString(CryptoJS.enc.Hex);
 
-const passphrase = hashToPassphrase(cipherKey, 20, 6); 
+      const passphrase = hashToPassphrase(cipherKey, 50); // 50 phrases
 
       cipherText.innerHTML = `<h4>Your Generated Identity</h4>
         <p style="word-break: break-word; font-family: monospace;">${passphrase}</p>
         <button id="copyBtn" class="copy-btn">Copy</button>`;
 
-      // Copy button
       document.getElementById('copyBtn').addEventListener('click', () => {
         navigator.clipboard.writeText(passphrase).then(() => {
           document.getElementById('copyBtn').textContent = 'Copied!';
@@ -63,43 +61,50 @@ const passphrase = hashToPassphrase(cipherKey, 20, 6);
       });
     });
 
-    // Edit button
     document.getElementById('editBtn').addEventListener('click', () => modal.style.display = 'none');
   });
 
   closeBtn.addEventListener('click', () => modal.style.display = 'none');
+  window.addEventListener('click', e => { if (e.target === modal) modal.style.display = 'none'; });
 
-  window.addEventListener('click', e => {
-    if (e.target === modal) modal.style.display = 'none';
-  });
+  // ---- Convert SHA-256 hash to passphrase with 50 elements (words + chars + symbols) ----
+  function hashToPassphrase(hash, elementCount = 50) {
+    const letters = 'abcdefghijklmnopqrstuvwxyz';
+    const numbers = '0123456789';
+    const symbols = '!@#$%^&*()_+=';
+    const allChars = letters + letters.toUpperCase() + numbers + symbols;
 
-  // ---- Convert SHA-256 hash to passphrase ----
-function hashToPassphrase(hash, wordCount = 20, wordLength = 6) {
-  const letters = 'abcdefghijklmnopqrstuvwxyz';
-  const numbers = '0123456789';
-  const symbols = '!@#$%^&*()_+='; // NO hyphen here
-  const allChars = letters + letters.toUpperCase() + numbers + symbols;
-
-  const words = [];
-  let index = 0;
-
-  function nextByte() {
-    const byte = parseInt(hash.substr(index, 2), 16);
-    index += 2;
-    if (index >= hash.length) index = 0;
-    return byte;
-  }
-
-  for (let i = 0; i < wordCount; i++) {
-    let word = '';
-    for (let j = 0; j < wordLength; j++) {
-      word += allChars[nextByte() % allChars.length];
+    let index = 0;
+    function nextByte() {
+      const byte = parseInt(hash.substr(index, 2), 16);
+      index += 2;
+      if (index >= hash.length) index = 0;
+      return byte;
     }
-    words.push(word);
+
+    const result = [];
+    for (let i = 0; i < elementCount; i++) {
+      const useWord = nextByte() % 2 === 0; // 50% chance to use a word
+      if (useWord) {
+        const word = wordlist[nextByte() % wordlist.length];
+        // optionally insert a number or symbol inside word
+        const inject = nextByte() % 2 === 0;
+        if (inject) {
+          const char = allChars[nextByte() % allChars.length];
+          const pos = nextByte() % (word.length + 1);
+          result.push(word.slice(0, pos) + char + word.slice(pos));
+        } else {
+          result.push(word);
+        }
+      } else {
+        // random 3-6 character fragment
+        const len = 3 + (nextByte() % 4); // 3-6 chars
+        let fragment = '';
+        for (let j = 0; j < len; j++) fragment += allChars[nextByte() % allChars.length];
+        result.push(fragment);
+      }
+    }
+
+    return result.join('-'); // hyphen-separated
   }
-
-  return words.join('-'); // clean, single separator
-}
-
-
 });
