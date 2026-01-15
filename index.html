@@ -10,14 +10,38 @@
   <div class="container">
     <h2>Digital ID Generator</h2>
     <form id="keyForm">
-      <input type="text" name="fullname" placeholder="Full Name" required>
-      <input type="date" name="birthdate" required>
-      <input type="text" name="drivers_license" placeholder="Driver's License" required>
-      <input type="text" name="philsys_id" placeholder="PhilSys ID" required>
-      <input type="tel" name="mobile_number" placeholder="Mobile Number" required>
-      <input type="email" name="email" placeholder="Email" required>
-      <input type="text" name="domain" placeholder="Domain (example.com)" required>
-      <input type="password" name="secret_key" placeholder="Secret Key" required>
+      <div class="form-group">
+        <input type="text" name="fullname" id="fullname" placeholder=" " required>
+        <label for="fullname">Full Name</label>
+      </div>
+      <div class="form-group">
+        <input type="date" name="birthdate" id="birthdate" placeholder=" " required>
+        <label for="birthdate">Birthdate</label>
+      </div>
+      <div class="form-group">
+        <input type="text" name="drivers_license" id="drivers_license" placeholder=" " required>
+        <label for="drivers_license">Driver's License</label>
+      </div>
+      <div class="form-group">
+        <input type="text" name="philsys_id" id="philsys_id" placeholder=" " required>
+        <label for="philsys_id">PhilSys ID</label>
+      </div>
+      <div class="form-group">
+        <input type="tel" name="mobile_number" id="mobile_number" placeholder=" " required>
+        <label for="mobile_number">Mobile Number</label>
+      </div>
+      <div class="form-group">
+        <input type="email" name="email" id="email" placeholder=" " required>
+        <label for="email">Email</label>
+      </div>
+      <div class="form-group">
+        <input type="text" name="domain" id="domain" placeholder=" " required>
+        <label for="domain">Domain (example.com)</label>
+      </div>
+      <div class="form-group">
+        <input type="password" name="secret_key" id="secret_key" placeholder=" " required>
+        <label for="secret_key">Secret Key</label>
+      </div>
       <button type="submit">Generate Cipher Key</button>
     </form>
   </div>
