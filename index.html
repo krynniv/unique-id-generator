@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Passphrase Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      max-width: 800px;
+    }
+    .box {
+      padding: 15px;
+      border: 1px solid #ddd;
+      margin-top: 20px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 15px;
+      cursor: pointer;
+    }
+    #result {
+      word-break: break-word;
+      font-size: 18px;
+    }
+    #qr {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Passphrase Generator</h2>
+
+<div class="box">
+  <button onclick="generate()">Generate Passphrase + QR</button>
+</div>
+
+<div class="box">
+  <p id="result"></p>
+  <div id="qr"></div>
+  <button id="copyBtn" onclick="copyPass()" style="display:none;">Copy Passphrase</button>
+</div>
+
+<!-- QR library -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+<script>
+let passphrase = "";
+let lastPayload = "";
+
+const words = [
+  "alpha","bravo","carbon","delta","echo","falcon","gamma","helium",
+  "iron","jupiter","kilo","lunar","matrix","nova","omega","pixel",
+  "quantum","rocket","sigma","terra","ultra","vector","whisper","zen"
+];
+
+async function generate() {
+  let input = prompt("Enter seed (secret phrase):");
+  if (!input) return;
+
+  let data = new TextEncoder().encode(input);
+  let hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  let hash = new Uint8Array(hashBuffer);
+
+  let parts = [];
+  for (let i = 0; i < 16; i++) {
+    let index = hash[i] % words.length;
+    parts.push(words[index]);
+  }
+
+  passphrase = parts.join("-");
+
+  lastPayload = JSON.stringify({
+    seed: input,
+    passphrase: passphrase
+  });
+
+  document.getElementById("result").innerText = passphrase;
+  document.getElementById("copyBtn").style.display = "inline-block";
+
+  document.getElementById("qr").innerHTML = "";
+
+  QRCode.toCanvas(lastPayload, { width: 200 }, function (err, canvas) {
+    if (!err) document.getElementById("qr").appendChild(canvas);
+  });
+}
+
+function copyPass() {
+  navigator.clipboard.writeText(passphrase);
+}
+</script>
+
+</body>
+</html>
