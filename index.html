@@ -65,7 +65,7 @@ async function generate() {
   let hash = new Uint8Array(hashBuffer);
 
   let parts = [];
-  for (let i = 0; i < 16; i++) {
+  for (let i = 0; i < 8; i++) {
     let index = hash[i] % words.length;
     parts.push(words[index]);
   }
