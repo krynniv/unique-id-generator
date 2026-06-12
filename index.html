@@ -35,7 +35,6 @@
 
 <div class="box">
   <button onclick="generate()">Generate Passphrase + QR</button>
-  <p id="preview"></p>
 </div>
 
 <div class="box">
@@ -56,34 +55,12 @@ const words = [
   "iron","jupiter","kilo","lunar","matrix","nova","omega","pixel",
   "quantum","rocket","sigma","terra","ultra","vector","whisper","zen"
 ];
+
 async function generate() {
   let input = prompt("Enter seed (secret phrase):");
   if (!input) return;
 
-  let providerChoice = prompt("Select email provider:\n1 - Google\n2 - Outlook\n3 - None");
-
-  let provider = "none";
-  if (providerChoice === "1") provider = "google";
-  else if (providerChoice === "2") provider = "outlook";
-  else provider = "none";
-
-  let email = "";
-  if (provider !== "none") {
-    email = prompt("Enter email address:");
-    if (!email) email = "";
-  }
-
-  let combinedSeed = input;
-
-  if (provider !== "none" && email) {
-    combinedSeed = `${input}|${provider}|${email}`;
-  }
-
-  // preview
-  document.getElementById("preview").innerText =
-    `Seed: ${input}\nProvider: ${provider}\nEmail: ${email || "none"}`;
-
-  let data = new TextEncoder().encode(combinedSeed);
+  let data = new TextEncoder().encode(input);
   let hashBuffer = await crypto.subtle.digest("SHA-256", data);
   let hash = new Uint8Array(hashBuffer);
 
@@ -97,8 +74,6 @@ async function generate() {
 
   lastPayload = JSON.stringify({
     seed: input,
-    provider: provider,
-    email: provider !== "none" ? email : null,
     passphrase: passphrase
   });
 
